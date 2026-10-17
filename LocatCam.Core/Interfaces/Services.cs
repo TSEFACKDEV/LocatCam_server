@@ -1,4 +1,4 @@
-namespace LocatCam.Core.Services;
+namespace LocatCam.Core.Interfaces;
 
 using LocatCam.Core.Dtos;
 using LocatCam.Core.Entities;
