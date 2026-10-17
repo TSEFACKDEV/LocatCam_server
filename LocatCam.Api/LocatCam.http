@@ -1,0 +1,148 @@
+@baseUrl = http://localhost:5000
+@accessToken =
+
+### 1. Inscription d'un étudiant
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "nom": "Jean Kamdem",
+  "email": "etudiant1@locatcam.cm",
+  "telephone": "+237 612 345 678",
+  "motDePasse": "Etudiant@123",
+  "role": "Etudiant"
+}
+
+### 2. Inscription d'un bailleur
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "nom": "Pierre Mbarga",
+  "email": "bailleur1@locatcam.cm",
+  "telephone": "+237 698 765 432",
+  "motDePasse": "Bailleur@123",
+  "role": "Bailleur"
+}
+
+### 3. Connexion
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "etudiant1@locatcam.cm",
+  "motDePasse": "Etudiant@123"
+}
+
+### 4. Refresh token
+POST {{baseUrl}}/api/auth/refresh
+Content-Type: application/json
+
+"votre_refresh_token_ici"
+
+### 5. Profil utilisateur connecté
+GET {{baseUrl}}/api/auth/me
+Authorization: Bearer {{accessToken}}
+
+### 6. Liste des annonces avec filtres
+GET {{baseUrl}}/api/annonces?prixMin=30000&prixMax=100000&ville=Douala&type=Studio&estMeuble=true&page=1&pageSize=20
+
+### 7. Détail d'une annonce
+GET {{baseUrl}}/api/annonces/00000000-0000-0000-0000-000000000001
+
+### 8. Créer une annonce (bailleur uniquement)
+POST {{baseUrl}}/api/annonces
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "titre": "Chambre meublée à Bonapriso",
+  "description": "Très belle chambre meublée située dans le quartier prisé de Bonapriso à Douala. Disponible immédiatement. Idéal pour étudiants.",
+  "prix": 35000,
+  "type": "Chambre",
+  "quartier": "Bonapriso",
+  "ville": "Douala",
+  "adresse": "125 Rue de Bonapriso, Bonapriso, Douala",
+  "latitude": 4.0511,
+  "longitude": 9.7679,
+  "estMeuble": true,
+  "nombrePieces": 1,
+  "disponible": true
+}
+
+### 9. Mettre à jour une annonce (propriétaire uniquement)
+PUT {{baseUrl}}/api/annonces/00000000-0000-0000-0000-000000000001
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "prix": 38000,
+  "disponible": true
+}
+
+### 10. Supprimer une annonce (soft delete)
+DELETE {{baseUrl}}/api/annonces/00000000-0000-0000-0000-000000000001
+Authorization: Bearer {{accessToken}}
+
+### 11. Annonces dans une bounding box (carte)
+GET {{baseUrl}}/api/annonces/map?minLat=4.0&maxLat=4.1&minLng=9.7&maxLng=9.8
+
+### 12. Mes annonces (bailleur connecté)
+GET {{baseUrl}}/api/annonces/mes-annonces
+Authorization: Bearer {{accessToken}}
+
+### 13. Signature Cloudinary pour upload d'image
+POST {{baseUrl}}/api/photos/signature
+
+### 14. Mes favoris
+GET {{baseUrl}}/api/favoris
+Authorization: Bearer {{accessToken}}
+
+### 15. Ajouter aux favoris
+POST {{baseUrl}}/api/favoris/00000000-0000-0000-0000-000000000001
+Authorization: Bearer {{accessToken}}
+
+### 16. Retirer des favoris
+DELETE {{baseUrl}}/api/favoris/00000000-0000-0000-0000-000000000001
+Authorization: Bearer {{accessToken}}
+
+### 17. Envoyer un message
+POST {{baseUrl}}/api/messages
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "annonceId": "00000000-0000-0000-0000-000000000001",
+  "destinataireId": "00000000-0000-0000-0000-000000000002",
+  "contenu": "Bonjour, l'annonce est-elle encore disponible ?"
+}
+
+### 18. Mes conversations
+GET {{baseUrl}}/api/messages/conversations
+Authorization: Bearer {{accessToken}}
+
+### 19. Conversation avec un utilisateur
+GET {{baseUrl}}/api/messages/conversation/00000000-0000-0000-0000-000000000002
+Authorization: Bearer {{accessToken}}
+
+### 20. Marquer un message comme lu
+PUT {{baseUrl}}/api/messages/00000000-0000-0000-0000-000000000001/lu
+Authorization: Bearer {{accessToken}}
+
+### 21. Signaler une annonce
+POST {{baseUrl}}/api/signalements
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "annonceId": "00000000-0000-0000-0000-000000000001",
+  "raison": "Annonce frauduleuse, le propriétaire ne répond pas."
+}
+
+### 22. Vérifier une annonce (Admin)
+PUT {{baseUrl}}/api/admin/annonces/00000000-0000-0000-0000-000000000001/verifier?verifier=true
+Authorization: Bearer {{accessToken}}
+
+### 23. Bannir un utilisateur (Admin)
+PUT {{baseUrl}}/api/admin/users/00000000-0000-0000-0000-000000000002/bannir?bannir=true
+Authorization: Bearer {{accessToken}}
