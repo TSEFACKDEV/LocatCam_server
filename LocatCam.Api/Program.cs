@@ -49,6 +49,9 @@ builder.Services.AddScoped<LocatCam.Core.Interfaces.ISignalementService, LocatCa
 builder.Services.AddScoped<LocatCam.Core.Interfaces.IAdminService, LocatCam.Infrastructure.Services.AdminService>();
 builder.Services.AddScoped<ITokenService, LocatCam.Infrastructure.Services.TokenService>();
 
+// --- Seed des données de test ---
+builder.Services.AddScoped<LocatCam.Infrastructure.Seed.DataSeeder>();
+
 // --- JWT Authentication ---
 var jwtSection = builder.Configuration.GetSection("Jwt");
 var secretKey = jwtSection["SecretKey"] ?? "LocatCamSuperSecretKeyMin32Chars!!!";
