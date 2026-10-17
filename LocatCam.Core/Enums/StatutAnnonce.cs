@@ -1,0 +1,1 @@
+namespace LocatCam.Core.Enums;
