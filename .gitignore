@@ -1,0 +1,58 @@
+# =============================================================================
+# LocatCam - .gitignore (.NET + MAUI)
+# =============================================================================
+
+## Build outputs
+bin/
+obj/
+out/
+*.user
+*.suo
+*.cache
+*.dll
+*.exe
+*.app
+*.apk
+*.aab
+*.ipa
+*.appx
+*.appxbundle
+
+## Visual Studio / Rider
+.vs/
+.idea/
+
+## macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+## Node / npm
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+
+## Publish / Azure
+publish/
+*.Publish.xml
+
+## Test coverage
+*.trx
+*.coverage
+coverage/
+TestResults/
+
+## Local secrets
+appsettings.*.json
+!appsettings.json
+!appsettings.Development.json
+secrets.json
+local.settings.json
+
+## MAUI specific
+*.LinkDescriptor.xml
+
+# End of file

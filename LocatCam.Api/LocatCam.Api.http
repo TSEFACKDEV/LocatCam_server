@@ -1,0 +1,6 @@
+@LocatCam.Api_HostAddress = http://localhost:5206
+
+GET {{LocatCam.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

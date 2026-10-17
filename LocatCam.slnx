@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="LocatCam.Api/LocatCam.Api.csproj" />
+  <Project Path="LocatCam.Core/LocatCam.Core.csproj" />
+  <Project Path="LocatCam.Infrastructure/LocatCam.Infrastructure.csproj" />
+  <Project Path="LocatCam.Tests/LocatCam.Tests.csproj" />
+</Solution>
