@@ -162,6 +162,7 @@ public class AnnonceService : IAnnonceService
             Disponible = a.Disponible,
             UserId = a.UserId,
             NomBailleur = a.User?.Nom,
+            TelephoneBailleur = a.User?.Telephone,
             EstVerifie = a.EstVerifie,
             Statut = a.Statut.ToString(),
             DateCreation = a.DateCreation,

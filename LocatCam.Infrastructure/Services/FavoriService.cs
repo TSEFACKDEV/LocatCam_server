@@ -70,6 +70,8 @@ public class FavoriService : IFavoriService
                 Type = f.Annonce.Type.ToString(),
                 Quartier = f.Annonce.Quartier,
                 Ville = f.Annonce.Ville,
+                NomBailleur = f.Annonce.User?.Nom,
+                TelephoneBailleur = f.Annonce.User?.Telephone,
                 EstVerifie = f.Annonce.EstVerifie,
                 Photos = f.Annonce.Photos.Select(p => new AnnoncePhotoDto
                 {

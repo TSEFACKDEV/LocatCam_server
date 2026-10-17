@@ -23,6 +23,7 @@ public class MappingProfile : Profile
             .ForMember(d => d.Type, o => o.MapFrom(s => s.Type.ToString()))
             .ForMember(d => d.Statut, o => o.MapFrom(s => s.Statut.ToString()))
             .ForMember(d => d.NomBailleur, o => o.MapFrom(s => s.User != null ? s.User.Nom : null))
+            .ForMember(d => d.TelephoneBailleur, o => o.MapFrom(s => s.User != null ? s.User.Telephone : null))
             .ForMember(d => d.Photos, o => o.MapFrom(s => s.Photos.OrderBy(p => p.Ordre)));
 
         // AnnoncePhoto <-> AnnoncePhotoDto

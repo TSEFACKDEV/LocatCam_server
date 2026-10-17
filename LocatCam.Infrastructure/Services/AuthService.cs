@@ -54,7 +54,7 @@ public class AuthService : IAuthService
         await _unitOfWork.Users.AddAsync(user, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return await BuildAuthResponseAsync(user, cancellationToken);
+        return await BuildAuthResponseAsync(user, cancellationToken, rotateRefreshToken: true);
     }
 
     /// <inheritdoc/>
@@ -67,18 +67,24 @@ public class AuthService : IAuthService
         if (!BCrypt.Verify(dto.MotDePasse, user.MotDePasseHash))
             throw new InvalidOperationException("Email ou mot de passe incorrect.");
 
-        return await BuildAuthResponseAsync(user, cancellationToken);
+        return await BuildAuthResponseAsync(user, cancellationToken, rotateRefreshToken: true);
     }
 
     /// <inheritdoc/>
     public async Task<AuthResponseDto> RefreshAsync(string refreshToken, CancellationToken cancellationToken = default)
     {
-        // En production, le refresh token serait stocké en base avec une date d'expiration.
-        // Ici, on régénère simplement une nouvelle paire de tokens à partir du refresh token fourni.
-        // Le refresh token sert d'identifiant opaque ; on retourne un nouveau access token.
-        // Pour simplifier, on génère un nouvel access token pour un utilisateur par défaut.
-        // Une implémentation complète stockerait les refresh tokens en base.
-        throw new NotImplementedException("Le refresh token doit être associé à un utilisateur en base (à implémenter avec stockage des refresh tokens).");
+        // Chercher l'utilisateur détenant ce refresh token et non expiré
+        var users = await _unitOfWork.Users.GetAllAsync(cancellationToken);
+        var user = users.FirstOrDefault(u =>
+            u.RefreshToken == refreshToken &&
+            u.RefreshTokenExpiry.HasValue &&
+            u.RefreshTokenExpiry.Value > DateTime.UtcNow);
+
+        if (user == null)
+            throw new InvalidOperationException("Refresh token invalide ou expiré.");
+
+        // Rotation : générer un nouveau refresh token
+        return await BuildAuthResponseAsync(user, cancellationToken, rotateRefreshToken: true);
     }
 
     /// <inheritdoc/>
@@ -100,18 +106,29 @@ public class AuthService : IAuthService
         };
     }
 
-    private async Task<AuthResponseDto> BuildAuthResponseAsync(User user, CancellationToken cancellationToken)
+    private async Task<AuthResponseDto> BuildAuthResponseAsync(User user, CancellationToken cancellationToken, bool rotateRefreshToken = false)
     {
         var accessToken = _tokenService.GenerateAccessToken(user);
-        var refreshToken = _tokenService.GenerateRefreshToken();
-        var expiration = DateTime.UtcNow.AddMinutes(
+        var refreshToken = rotateRefreshToken ? _tokenService.GenerateRefreshToken() : (user.RefreshToken ?? _tokenService.GenerateRefreshToken());
+        var refreshExpiry = DateTime.UtcNow.AddDays(7);
+        var accessExpiration = DateTime.UtcNow.AddMinutes(
             int.Parse(_configuration["Jwt:AccessTokenExpirationMinutes"] ?? "60"));
+
+        // Mettre à jour le refresh token en base si rotation
+        if (rotateRefreshToken)
+        {
+            user.RefreshToken = refreshToken;
+            user.RefreshTokenExpiry = refreshExpiry;
+            user.DateMiseAJour = DateTime.UtcNow;
+            await _unitOfWork.Users.UpdateAsync(user, cancellationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+        }
 
         return new AuthResponseDto
         {
             AccessToken = accessToken,
             RefreshToken = refreshToken,
-            Expiration = expiration,
+            Expiration = accessExpiration,
             User = new UserDto
             {
                 Id = user.Id,

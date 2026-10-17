@@ -155,6 +155,9 @@ public class AnnonceDto
     /// <summary>Nom du bailleur.</summary>
     public string? NomBailleur { get; set; }
 
+    /// <summary>Téléphone du bailleur (format camerounais).</summary>
+    public string? TelephoneBailleur { get; set; }
+
     /// <summary>Indique si vérifiée par un admin.</summary>
     public bool EstVerifie { get; set; }
 

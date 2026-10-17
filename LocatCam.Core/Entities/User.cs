@@ -27,4 +27,10 @@ public class User : BaseEntity
 
     /// <summary>Indique si l'utilisateur a vérifié son compte.</summary>
     public bool EstVerifie { get; set; }
+
+    /// <summary>Refresh token pour le renouvellement du jeton d'accès.</summary>
+    public string? RefreshToken { get; set; }
+
+    /// <summary>Date d'expiration du refresh token.</summary>
+    public DateTime? RefreshTokenExpiry { get; set; }
 }

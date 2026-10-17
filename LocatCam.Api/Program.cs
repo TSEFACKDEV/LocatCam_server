@@ -1,3 +1,4 @@
+using AutoMapper;
 using LocatCam.Api.Middleware;
 using LocatCam.Infrastructure.Data;
 using LocatCam.Infrastructure.Seed;
@@ -34,7 +35,7 @@ builder.Services.AddDbContext<LocatCamDbContext>(options =>
         "Host=localhost;Database=locatcam;Username=postgres;Password=postgres;"));
 
 // --- AutoMapper ---
-builder.Services.AddAutoMapper(typeof(LocatCam.Core.Services.MappingProfile));
+builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(LocatCam.Core.Services.MappingProfile).Assembly));
 
 // --- Répositories & Services métier ---
 builder.Services.AddScoped(typeof(LocatCam.Core.Interfaces.IRepository<>), typeof(LocatCam.Infrastructure.Repositories.Repository<>));
@@ -95,7 +96,7 @@ builder.Services.AddRateLimiter(options =>
     });
 });
 
-// --- OpenAPI natif .NET 10 ---
+// --- OpenAPI / Swagger ---
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi();
 

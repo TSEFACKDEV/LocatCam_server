@@ -49,6 +49,8 @@ TestResults/
 appsettings.*.json
 !appsettings.json
 !appsettings.Development.json
+.env
+.env.*
 secrets.json
 local.settings.json
 

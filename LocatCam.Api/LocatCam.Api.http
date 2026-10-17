@@ -1,6 +1,208 @@
 @LocatCam.Api_HostAddress = http://localhost:5206
 
-GET {{LocatCam.Api_HostAddress}}/weatherforecast/
-Accept: application/json
+### =============================================================================
+### AUTHENTIFICATION
+### =============================================================================
+
+### Inscription d'un utilisateur (étudiant ou bailleur)
+POST {{LocatCam.Api_HostAddress}}/api/auth/register
+Content-Type: application/json
+
+{
+  "nom": "Jean Kamdem",
+  "email": "etudiant1@locatcam.cm",
+  "telephone": "+237 6XX XXX XXX",
+  "motDePasse": "Etudiant@123",
+  "role": "Etudiant"
+}
+
+###
+
+### Connexion et obtention des tokens
+POST {{LocatCam.Api_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "etudiant1@locatcam.cm",
+  "motDePasse": "Etudiant@123"
+}
+
+###
+
+### Renouvellement du token d'accès (refresh token)
+POST {{LocatCam.Api_HostAddress}}/api/auth/refresh
+Content-Type: application/json
+
+"votre-refresh-token-ici"
+
+###
+
+### Informations de l'utilisateur connecté (JWT requis)
+GET {{LocatCam.Api_HostAddress}}/api/auth/me
+Content-Type: application/json
+Authorization: Bearer votre-access-token-ici
+
+###
+
+### =============================================================================
+### ANNONCES
+### =============================================================================
+
+### Liste paginée des annonces avec filtres
+GET {{LocatCam.Api_HostAddress}}/api/annonces?ville=Douala&prixMin=15000&prixMax=80000&type=Chambre&estMeuble=true&page=1&pageSize=20
+
+###
+
+### Détail d'une annonce avec ses photos
+GET {{LocatCam.Api_HostAddress}}/api/annonces/{id}
+
+###
+
+### Créer une annonce (bailleur uniquement, JWT requis)
+POST {{LocatCam.Api_HostAddress}}/api/annonces
+Content-Type: application/json
+Authorization: Bearer votre-access-token-ici
+
+{
+  "titre": "Charmante chambre à Bonapriso, Douala",
+  "description": "Très belle chambre située dans le quartier prisé de Bonapriso à Douala. Le logement est entièrement meublé et équipé. Disponible immédiatement. Idéal pour étudiants et jeunes actifs.",
+  "prix": 35000,
+  "type": "Chambre",
+  "quartier": "Bonapriso",
+  "ville": "Douala",
+  "adresse": "123 Rue de la Paix, Bonapriso, Douala",
+  "latitude": 4.0511,
+  "longitude": 9.7679,
+  "estMeuble": true,
+  "nombrePieces": 1,
+  "disponible": true
+}
+
+###
+
+### Mettre à jour une annonce (propriétaire uniquement, JWT requis)
+PUT {{LocatCam.Api_HostAddress}}/api/annonces/{id}
+Content-Type: application/json
+Authorization: Bearer votre-access-token-ici
+
+{
+  "titre": "Titre mis à jour",
+  "prix": 40000
+}
+
+###
+
+### Supprimer (soft delete) une annonce (propriétaire uniquement, JWT requis)
+DELETE {{LocatCam.Api_HostAddress}}/api/annonces/{id}
+Authorization: Bearer votre-access-token-ici
+
+###
+
+### Annonces dans une bounding box (pour la carte)
+GET {{LocatCam.Api_HostAddress}}/api/annonces/map?minLat=4.0&maxLat=4.1&minLng=9.7&maxLng=9.8
+
+###
+
+### Mes annonces (bailleur connecté, JWT requis)
+GET {{LocatCam.Api_HostAddress}}/api/annonces/mes-annonces
+Authorization: Bearer votre-access-token-ici
+
+###
+
+### =============================================================================
+### PHOTOS - SIGNATURE CLOUDINARY
+### =============================================================================
+
+### Générer une signature Cloudinary pour l'upload direct d'images
+POST {{LocatCam.Api_HostAddress}}/api/photos/signature
+
+###
+
+### =============================================================================
+### FAVORIS
+### =============================================================================
+
+### Mes favoris (JWT requis)
+GET {{LocatCam.Api_HostAddress}}/api/favoris
+Authorization: Bearer votre-access-token-ici
+
+###
+
+### Ajouter une annonce aux favoris (JWT requis)
+POST {{LocatCam.Api_HostAddress}}/api/favoris/{annonceId}
+Authorization: Bearer votre-access-token-ici
+
+###
+
+### Retirer une annonce des favoris (JWT requis)
+DELETE {{LocatCam.Api_HostAddress}}/api/favoris/{annonceId}
+Authorization: Bearer votre-access-token-ici
+
+###
+
+### =============================================================================
+### MESSAGERIE
+### =============================================================================
+
+### Envoyer un message (JWT requis)
+POST {{LocatCam.Api_HostAddress}}/api/messages
+Content-Type: application/json
+Authorization: Bearer votre-access-token-ici
+
+{
+  "annonceId": "{id-annonce}",
+  "destinataireId": "{id-bailleur}",
+  "contenu": "Bonjour, l'annonce est-elle encore disponible ? Je suis intéressé."
+}
+
+###
+
+### Liste des conversations (JWT requis)
+GET {{LocatCam.Api_HostAddress}}/api/messages/conversations
+Authorization: Bearer votre-access-token-ici
+
+###
+
+### Détail d'une conversation (JWT requis)
+GET {{LocatCam.Api_HostAddress}}/api/messages/conversation/{autreUserId}
+Authorization: Bearer votre-access-token-ici
+
+###
+
+### Marquer un message comme lu (JWT requis)
+PUT {{LocatCam.Api_HostAddress}}/api/messages/{id}/lu
+Authorization: Bearer votre-access-token-ici
+
+###
+
+### =============================================================================
+### SIGNALEMENTS
+### =============================================================================
+
+### Signaler une annonce (JWT requis)
+POST {{LocatCam.Api_HostAddress}}/api/signalements
+Content-Type: application/json
+Authorization: Bearer votre-access-token-ici
+
+{
+  "annonceId": "{id-annonce}",
+  "raison": "Contenu inapproprié ou arnaque présumée"
+}
+
+###
+
+### =============================================================================
+### ADMIN (rôle Admin requis)
+### =============================================================================
+
+### Vérifier ou dévérifier une annonce (JWT Admin)
+PUT {{LocatCam.Api_HostAddress}}/api/admin/annonces/{id}/verifier?verifier=true
+Authorization: Bearer votre-access-token-admin-ici
+
+###
+
+### Bannir ou débannir un utilisateur (JWT Admin)
+PUT {{LocatCam.Api_HostAddress}}/api/admin/users/{id}/bannir?bannir=true
+Authorization: Bearer votre-access-token-admin-ici
 
 ###
