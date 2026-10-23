@@ -19,6 +19,9 @@ public interface IAuthService
 
     /// <summary>Récupère les informations de l'utilisateur connecté.</summary>
     Task<UserDto?> GetMeAsync(Guid userId, CancellationToken cancellationToken = default);
+
+    /// <summary>Met à jour l'URL de la photo de profil de l'utilisateur.</summary>
+    Task<UserDto?> UpdatePhotoAsync(Guid userId, string photoUrl, CancellationToken cancellationToken = default);
 }
 
 /// <summary>

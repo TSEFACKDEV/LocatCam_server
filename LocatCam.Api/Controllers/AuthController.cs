@@ -117,4 +117,30 @@ public class AuthController : ControllerBase
 
         return Ok(user);
     }
+
+    /// <summary>
+    /// Met à jour la photo de profil de l'utilisateur connecté.
+    /// </summary>
+    /// <param name="dto">URL de la photo de profil.</param>
+    /// <param name="cancellationToken">Jeton d'annulation.</param>
+    /// <returns>Utilisateur mis à jour.</returns>
+    /// <response code="200">Photo mise à jour.</response>
+    /// <response code="401">Non authentifié.</response>
+    /// <response code="404">Utilisateur non trouvé.</response>
+    [HttpPut("me/photo")]
+    [Authorize]
+    public async Task<IActionResult> UpdatePhoto([FromBody] UpdatePhotoDto dto, CancellationToken cancellationToken)
+    {
+        var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+        if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
+            return Unauthorized(new { status = 401, message = "Token invalide." });
+
+        if (string.IsNullOrWhiteSpace(dto.PhotoUrl))
+            return BadRequest(new { status = 400, message = "L'URL de la photo est obligatoire." });
+
+        var user = await _authService.UpdatePhotoAsync(userId, dto.PhotoUrl, cancellationToken);
+        if (user == null) return NotFound(new { status = 404, message = "Utilisateur non trouvé." });
+
+        return Ok(user);
+    }
 }

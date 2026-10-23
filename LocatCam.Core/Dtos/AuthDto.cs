@@ -43,6 +43,15 @@ public class RefreshRequestDto
 }
 
 /// <summary>
+/// Requête de mise à jour de la photo de profil.
+/// </summary>
+public class UpdatePhotoDto
+{
+    /// <summary>URL de la photo de profil (Cloudinary).</summary>
+    public string PhotoUrl { get; set; } = string.Empty;
+}
+
+/// <summary>
 /// Réponse d'authentification contenant les tokens et les informations utilisateur.
 /// </summary>
 public class AuthResponseDto

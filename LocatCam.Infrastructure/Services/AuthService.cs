@@ -106,6 +106,31 @@ public class AuthService : IAuthService
         };
     }
 
+    /// <inheritdoc/>
+    public async Task<UserDto?> UpdatePhotoAsync(Guid userId, string photoUrl, CancellationToken cancellationToken = default)
+    {
+        var user = await _unitOfWork.Users.GetByIdAsync(userId, cancellationToken);
+        if (user == null) return null;
+
+        user.PhotoUrl = photoUrl;
+        user.DateMiseAJour = DateTime.UtcNow;
+
+        await _unitOfWork.Users.UpdateAsync(user, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return new UserDto
+        {
+            Id = user.Id,
+            Nom = user.Nom,
+            Email = user.Email,
+            Telephone = user.Telephone,
+            Role = user.Role.ToString(),
+            PhotoUrl = user.PhotoUrl,
+            EstVerifie = user.EstVerifie,
+            DateCreation = user.DateCreation
+        };
+    }
+
     private async Task<AuthResponseDto> BuildAuthResponseAsync(User user, CancellationToken cancellationToken, bool rotateRefreshToken = false)
     {
         var accessToken = _tokenService.GenerateAccessToken(user);
