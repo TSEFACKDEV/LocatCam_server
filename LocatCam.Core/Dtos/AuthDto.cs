@@ -34,6 +34,15 @@ public class LoginRequestDto
 }
 
 /// <summary>
+/// Requête de renouvellement de jeton d'accès (refresh token).
+/// </summary>
+public class RefreshRequestDto
+{
+    /// <summary>Refresh token valide précédemment émis.</summary>
+    public string RefreshToken { get; set; } = string.Empty;
+}
+
+/// <summary>
 /// Réponse d'authentification contenant les tokens et les informations utilisateur.
 /// </summary>
 public class AuthResponseDto

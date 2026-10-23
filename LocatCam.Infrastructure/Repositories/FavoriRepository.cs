@@ -24,6 +24,8 @@ public class FavoriRepository : Repository<Favori>, IFavoriRepository
         return await _dbSet
             .Include(f => f.Annonce)
             .ThenInclude(a => a.Photos)
+            .Include(f => f.Annonce)
+            .ThenInclude(a => a.User)
             .Where(f => f.UserId == userId)
             .OrderByDescending(f => f.DateAjout)
             .ToListAsync(cancellationToken);

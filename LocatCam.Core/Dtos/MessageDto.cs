@@ -46,6 +46,15 @@ public class MessageDto
 
     /// <summary>Indique si lu par le destinataire.</summary>
     public bool Lu { get; set; }
+
+    /// <summary>Nom de l'expéditeur (renseigné dans les listes de conversations).</summary>
+    public string? ExpediteurNom { get; set; }
+
+    /// <summary>Nom du destinataire (renseigné dans les listes de conversations).</summary>
+    public string? DestinataireNom { get; set; }
+
+    /// <summary>Titre de l'annonce concernée (renseigné dans les listes de conversations).</summary>
+    public string? AnnonceTitre { get; set; }
 }
 
 /// <summary>

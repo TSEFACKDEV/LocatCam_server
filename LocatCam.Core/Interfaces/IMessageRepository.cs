@@ -13,6 +13,9 @@ public interface IMessageRepository : IRepository<Message>
     /// <summary>Récupère la conversation entre deux utilisateurs (optionnellement sur une annonce).</summary>
     Task<IEnumerable<Message>> GetConversationAsync(Guid user1Id, Guid user2Id, Guid? annonceId = null, CancellationToken cancellationToken = default);
 
+    /// <summary>Marque comme lus tous les messages reçus d'un utilisateur.</summary>
+    Task MarkConversationAsReadAsync(Guid destinataireId, Guid expediteurId, CancellationToken cancellationToken = default);
+
     /// <summary>Marque un message comme lu.</summary>
     Task MarkAsReadAsync(Guid messageId, CancellationToken cancellationToken = default);
 }

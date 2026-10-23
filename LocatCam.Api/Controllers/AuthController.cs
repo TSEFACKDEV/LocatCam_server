@@ -73,18 +73,21 @@ public class AuthController : ControllerBase
     /// <summary>
     /// Renouvelle le jeton d'accès via un refresh token.
     /// </summary>
-    /// <param name="refreshToken">Refresh token valide.</param>
+    /// <param name="dto">Refresh token valide.</param>
     /// <param name="cancellationToken">Jeton d'annulation.</param>
     /// <returns>Nouvel access token + nouveau refresh token.</returns>
     /// <response code="200">Renouvellement réussi.</response>
     /// <response code="400">Refresh token invalide.</response>
     [HttpPost("refresh")]
     [AllowAnonymous]
-    public async Task<IActionResult> Refresh([FromBody] string refreshToken, CancellationToken cancellationToken)
+    public async Task<IActionResult> Refresh([FromBody] RefreshRequestDto dto, CancellationToken cancellationToken)
     {
+        if (dto == null || string.IsNullOrWhiteSpace(dto.RefreshToken))
+            return BadRequest(new { status = 400, message = "Refresh token manquant." });
+
         try
         {
-            var result = await _authService.RefreshAsync(refreshToken, cancellationToken);
+            var result = await _authService.RefreshAsync(dto.RefreshToken, cancellationToken);
             return Ok(result);
         }
         catch (Exception ex)

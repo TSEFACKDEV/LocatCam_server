@@ -82,6 +82,18 @@ public class MessagesController : ControllerBase
         return Ok(messages);
     }
 
+    [HttpPut("conversation/{autreUserId}/lu")]
+    [Authorize]
+    public async Task<IActionResult> MarkConversationAsRead(Guid autreUserId, CancellationToken cancellationToken)
+    {
+        var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+        if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
+            return Unauthorized(new { status = 401, message = "Token invalide." });
+
+        await _messageService.MarkConversationAsReadAsync(userId, autreUserId, cancellationToken);
+        return Ok(new { status = 200, message = "Conversation marquée comme lue." });
+    }
+
     /// <summary>
     /// Marque un message comme lu.
     /// </summary>

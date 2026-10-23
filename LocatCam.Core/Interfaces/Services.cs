@@ -44,6 +44,9 @@ public interface IAnnonceService
     /// <summary>Supprime (soft delete) une annonce (propriétaire uniquement).</summary>
     Task<bool> DeleteAsync(Guid id, Guid userId, CancellationToken cancellationToken = default);
 
+    /// <summary>Déclare des photos Cloudinary liées à une annonce (après upload mobile).</summary>
+    Task AddPhotosAsync(Guid annonceId, IEnumerable<PhotoCreateDto> photos, CancellationToken cancellationToken = default);
+
     /// <summary>Récupère les annonces dans une bounding box pour la carte.</summary>
     Task<IEnumerable<AnnonceDto>> GetByBoundingBoxAsync(
         double minLat, double maxLat, double minLng, double maxLng,
@@ -94,6 +97,9 @@ public interface IMessageService
 
     /// <summary>Marque un message comme lu.</summary>
     Task<bool> MarkAsReadAsync(Guid messageId, Guid userId, CancellationToken cancellationToken = default);
+
+    /// <summary>Marque comme lus tous les messages reçus d'un utilisateur.</summary>
+    Task<bool> MarkConversationAsReadAsync(Guid userId, Guid autreUserId, CancellationToken cancellationToken = default);
 }
 
 /// <summary>

@@ -72,7 +72,7 @@ public class AnnonceService : IAnnonceService
             NombrePieces = dto.NombrePieces,
             Disponible = dto.Disponible,
             UserId = userId,
-            Statut = StatutAnnonce.Brouillon,
+            Statut = StatutAnnonce.Publiee,
             EstVerifie = false,
             DateCreation = DateTime.UtcNow
         };
@@ -125,6 +125,32 @@ public class AnnonceService : IAnnonceService
         await _unitOfWork.Annonces.UpdateAsync(annonce, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         return true;
+    }
+
+    /// <inheritdoc/>
+    public async Task AddPhotosAsync(Guid annonceId, IEnumerable<PhotoCreateDto> photos, CancellationToken cancellationToken = default)
+    {
+        var annonce = await _unitOfWork.Annonces.GetByIdAsync(annonceId, cancellationToken);
+        if (annonce == null)
+            throw new InvalidOperationException("Annonce non trouvée.");
+
+        var ordre = (annonce.Photos?.Count ?? 0);
+        foreach (var photo in photos)
+        {
+            var entity = new AnnoncePhoto
+            {
+                Id = Guid.NewGuid(),
+                AnnonceId = annonceId,
+                UrlCloudinary = photo.UrlCloudinary,
+                PublicId = photo.PublicId,
+                Ordre = photo.Ordre > 0 ? photo.Ordre : ordre++,
+                EstPrincipale = photo.EstPrincipale,
+                DateCreation = DateTime.UtcNow
+            };
+            await _unitOfWork.AnnoncePhotos.AddAsync(entity, cancellationToken);
+        }
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 
     /// <inheritdoc/>

@@ -65,6 +65,14 @@ public class MessageService : IMessageService
         return true;
     }
 
+    /// <inheritdoc/>
+    public async Task<bool> MarkConversationAsReadAsync(Guid userId, Guid autreUserId, CancellationToken cancellationToken = default)
+    {
+        await _unitOfWork.Messages.MarkConversationAsReadAsync(userId, autreUserId, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        return true;
+    }
+
     private static MessageDto MapToDto(Message m)
     {
         return new MessageDto
@@ -75,7 +83,10 @@ public class MessageService : IMessageService
             DestinataireId = m.DestinataireId,
             Contenu = m.Contenu,
             DateEnvoi = m.DateEnvoi,
-            Lu = m.Lu
+            Lu = m.Lu,
+            ExpediteurNom = m.Expediteur?.Nom,
+            DestinataireNom = m.Destinataire?.Nom,
+            AnnonceTitre = m.Annonce?.Titre
         };
     }
 }

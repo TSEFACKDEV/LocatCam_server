@@ -188,3 +188,24 @@ public class PhotoSignatureDto
     /// <summary>Signature sécurisée générée côté serveur.</summary>
     public string Signature { get; set; } = string.Empty;
 }
+
+/// <summary>
+/// Données pour déclarer une photo Cloudinary liée à une annonce (après upload côté mobile).
+/// </summary>
+public class PhotoCreateDto
+{
+    /// <summary>Identifiant de l'annonce concernée.</summary>
+    public Guid AnnonceId { get; set; }
+
+    /// <summary>URL de l'image sur Cloudinary.</summary>
+    public string UrlCloudinary { get; set; } = string.Empty;
+
+    /// <summary>Identifiant public Cloudinary.</summary>
+    public string PublicId { get; set; } = string.Empty;
+
+    /// <summary>Ordre d'affichage.</summary>
+    public int Ordre { get; set; }
+
+    /// <summary>Indique si c'est la photo principale.</summary>
+    public bool EstPrincipale { get; set; }
+}

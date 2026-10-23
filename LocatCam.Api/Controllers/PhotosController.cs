@@ -30,7 +30,7 @@ public class PhotosController : ControllerBase
     /// <returns>Signature Cloudinary (timestamp, folder, upload_preset, signature).</returns>
     /// <response code="200">Signature générée.</response>
     [HttpPost("signature")]
-    [AllowAnonymous]
+    [Authorize]
     public async Task<IActionResult> GenerateSignature(CancellationToken cancellationToken)
     {
         var signature = await _photoService.GenerateSignatureAsync(cancellationToken);

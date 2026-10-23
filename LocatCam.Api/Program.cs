@@ -4,6 +4,7 @@ using LocatCam.Infrastructure.Data;
 using LocatCam.Infrastructure.Seed;
 using LocatCam.Core.Interfaces;
 using LocatCam.Core.Services;
+using LocatCam.Core.Dtos;
 using LocatCam.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
@@ -12,6 +13,7 @@ using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using FluentValidation;
 using System.Text;
+using LocatCam.Core.Validation;
 
 // --- Serilog : console + fichier ---
 Log.Logger = new LoggerConfiguration()
@@ -25,9 +27,11 @@ var builder = WebApplication.CreateBuilder(args);
 // Serilog comme provider de logs
 builder.Host.UseSerilog();
 
-// --- Configuration depuis appsettings ---
+// --- Configuration depuis appsettings (CreateBuilder les charge déjà,
+//   suivi des variables d'environnement qui prennent le pas sur le JSON) ---
 builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true);
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
+    .AddEnvironmentVariables();
 
 // --- DbContext PostgreSQL ---
 builder.Services.AddDbContext<LocatCamDbContext>(options =>
@@ -36,6 +40,15 @@ builder.Services.AddDbContext<LocatCamDbContext>(options =>
 
 // --- AutoMapper ---
 builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(LocatCam.Core.Services.MappingProfile).Assembly));
+
+// --- FluentValidation : enregistrement manuel des validateurs -
+// ASP.NET Core du00e9couvre automatiquement les IValidatoru003cTu003e pour valider les DTOs de contru00f4leur
+builder.Services.AddTransient<IValidator<AnnonceCreateDto>, AnnonceCreateDtoValidator>();
+builder.Services.AddTransient<IValidator<SignalementCreateDto>, SignalementCreateDtoValidator>();
+builder.Services.AddTransient<IValidator<RegisterRequestDto>, RegisterRequestDtoValidator>();
+builder.Services.AddTransient<IValidator<LoginRequestDto>, LoginRequestDtoValidator>();
+builder.Services.AddTransient<IValidator<MessageCreateDto>, MessageCreateDtoValidator>();
+builder.Services.AddTransient<IValidator<AnnonceUpdateDto>, AnnonceUpdateDtoValidator>();
 
 // --- Répositories & Services métier ---
 builder.Services.AddScoped(typeof(LocatCam.Core.Interfaces.IRepository<>), typeof(LocatCam.Infrastructure.Repositories.Repository<>));

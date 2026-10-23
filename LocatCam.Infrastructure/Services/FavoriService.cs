@@ -45,8 +45,8 @@ public class FavoriService : IFavoriService
     /// <inheritdoc/>
     public async Task<bool> RemoveAsync(Guid userId, Guid annonceId, CancellationToken cancellationToken = default)
     {
-        var favoris = await _unitOfWork.Favoris.GetAllAsync(cancellationToken);
-        var favori = favoris.FirstOrDefault(f => f.UserId == userId && f.AnnonceId == annonceId);
+        var favoris = await _unitOfWork.Favoris.GetByUserIdAsync(userId, cancellationToken);
+        var favori = favoris.FirstOrDefault(f => f.AnnonceId == annonceId);
         if (favori == null) return false;
 
         await _unitOfWork.Favoris.DeleteAsync(favori, cancellationToken);
@@ -66,17 +66,28 @@ public class FavoriService : IFavoriService
             {
                 Id = f.Annonce.Id,
                 Titre = f.Annonce.Titre,
+                Description = f.Annonce.Description,
                 Prix = f.Annonce.Prix,
                 Type = f.Annonce.Type.ToString(),
                 Quartier = f.Annonce.Quartier,
                 Ville = f.Annonce.Ville,
+                Adresse = f.Annonce.Adresse,
+                Latitude = f.Annonce.Latitude,
+                Longitude = f.Annonce.Longitude,
+                EstMeuble = f.Annonce.EstMeuble,
+                NombrePieces = f.Annonce.NombrePieces,
+                Disponible = f.Annonce.Disponible,
+                UserId = f.Annonce.UserId,
                 NomBailleur = f.Annonce.User?.Nom,
                 TelephoneBailleur = f.Annonce.User?.Telephone,
                 EstVerifie = f.Annonce.EstVerifie,
+                Statut = f.Annonce.Statut.ToString(),
+                DateCreation = f.Annonce.DateCreation,
                 Photos = f.Annonce.Photos.Select(p => new AnnoncePhotoDto
                 {
                     Id = p.Id,
                     UrlCloudinary = p.UrlCloudinary,
+                    PublicId = p.PublicId,
                     Ordre = p.Ordre,
                     EstPrincipale = p.EstPrincipale
                 }).ToList()

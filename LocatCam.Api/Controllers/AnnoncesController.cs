@@ -6,6 +6,7 @@ using LocatCam.Core.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
 
 /// <summary>
 /// Contrôleur de gestion des annonces de logement.
@@ -204,5 +205,35 @@ public class AnnoncesController : ControllerBase
 
         var annonces = await _annonceService.GetMesAnnoncesAsync(userId, cancellationToken);
         return Ok(annonces);
+    }
+
+    /// <summary>
+    /// Déclare des photos Cloudinary liées à une annonce (après upload direct côté mobile).
+    /// </summary>
+    /// <param name="id">Identifiant de l'annonce.</param>
+    /// <param name="photos">Liste des photos à enregistrer.</param>
+    /// <param name="cancellationToken">Jeton d'annulation.</param>
+    /// <response code="200">Photos enregistrées.</response>
+    /// <response code="401">Non authentifié.</response>
+    /// <response code="403">Vous n'êtes pas le propriétaire.</response>
+    /// <response code="404">Annonce non trouvée.</response>
+    [HttpPost("{id}/photos")]
+    [Authorize(Roles = "Bailleur")]
+    public async Task<IActionResult> AddPhotos(
+        Guid id,
+        [FromBody] IEnumerable<PhotoCreateDto> photos,
+        CancellationToken cancellationToken)
+    {
+        var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+        if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
+            return Unauthorized(new { status = 401, message = "Token invalide." });
+
+        var annonce = await _annonceService.GetByIdAsync(id, cancellationToken);
+        if (annonce == null) return NotFound(new { status = 404, message = "Annonce non trouvée." });
+        if (annonce.UserId != userId) return Forbid("Vous n'êtes pas le propriétaire de cette annonce.");
+
+        var photoList = photos?.ToList() ?? new List<PhotoCreateDto>();
+        await _annonceService.AddPhotosAsync(id, photoList, cancellationToken);
+        return Ok(new { status = 200, message = $"{photoList.Count} photo(s) enregistrée(s)." });
     }
 }

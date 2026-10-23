@@ -52,4 +52,17 @@ public class MessageRepository : Repository<Message>, IMessageRepository
             _dbSet.Update(message);
         }
     }
+
+    /// <inheritdoc/>
+    public async Task MarkConversationAsReadAsync(Guid destinataireId, Guid expediteurId, CancellationToken cancellationToken = default)
+    {
+        var messages = await _dbSet
+            .Where(m => m.DestinataireId == destinataireId
+                        && m.ExpediteurId == expediteurId
+                        && !m.Lu)
+            .ToListAsync(cancellationToken);
+
+        foreach (var message in messages)
+            message.Lu = true;
+    }
 }

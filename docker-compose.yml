@@ -1,47 +1,53 @@
-version: "3.8"
-
 services:
   locatcam-db:
     image: postgres:16-alpine
     container_name: locatcam-db
+    restart: unless-stopped
     environment:
-      POSTGRES_DB: locatcam
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ${POSTGRES_DB:-locatcam}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Definir POSTGRES_PASSWORD dans .env}
+    # Ne jamais publier PostgreSQL sur Internet : l'API y accède via le réseau Docker.
+    # Le binding loopback reste disponible pour l'administration locale.
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5433:5432"
     volumes:
-      - locatcam_db_data:/var/lib/postgresql/data
+      # Volume recréé le 2026-10-21 après l'incident de sécurité (ancien volume conservé pour analyse).
+      - locatcam_db_data_v2:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-postgres} -d $${POSTGRES_DB:-locatcam}"]
       interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 10
+    security_opt:
+      - no-new-privileges:true
 
   locatcam-api:
     build:
-      context: ..
-      dockerfile: LocatCam_serveur/Dockerfile
+      context: .
+      dockerfile: Dockerfile
     container_name: locatcam-api
+    restart: unless-stopped
     depends_on:
       locatcam-db:
         condition: service_healthy
     ports:
       - "5206:5000"
     environment:
-      ASPNETCORE_ENVIRONMENT: Development
-      ConnectionStrings__DefaultConnection: Host=locatcam-db;Database=locatcam;Username=postgres;Password=postgres;
-      Jwt__SecretKey: LocatCamSuperSecretKeyMin32Chars!!!
-      Jwt__Issuer: locatcam.api
-      Jwt__Audience: locatcam.mobile
-      Jwt__AccessTokenExpirationMinutes: "60"
-      Cloudinary__CloudName: dgpt66w4z
-      Cloudinary__ApiKey: 715983593278264
-      Cloudinary__ApiSecret: o1x6LrZvHXOmlg2hpcNwouZ1B1Y
-      Cloudinary__UploadPreset: locatcam_unsigned
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Development}
+      ConnectionStrings__DefaultConnection: "Host=locatcam-db;Database=${POSTGRES_DB:-locatcam};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD};"
+      Jwt__SecretKey: ${JWT_SECRET:?Definir JWT_SECRET dans .env}
+      Jwt__Issuer: ${JWT_ISSUER:-locatcam.api}
+      Jwt__Audience: ${JWT_AUDIENCE:-locatcam.mobile}
+      Jwt__AccessTokenExpirationMinutes: ${JWT_EXPIRATION_MINUTES:-60}
+      Cloudinary__CloudName: ${CLOUDINARY_CLOUD_NAME}
+      Cloudinary__ApiKey: ${CLOUDINARY_API_KEY}
+      Cloudinary__ApiSecret: ${CLOUDINARY_API_SECRET}
+      Cloudinary__UploadPreset: ${CLOUDINARY_UPLOAD_PRESET:-locatcam_unsigned}
     volumes:
       - ./logs:/app/logs
-    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
 
 volumes:
-  locatcam_db_data:
+  locatcam_db_data_v2:

@@ -13,6 +13,18 @@ public class AnnonceRepository : Repository<Annonce>, IAnnonceRepository
 {
     public AnnonceRepository(LocatCamDbContext context) : base(context) { }
 
+    /// <summary>
+    /// Charge une annonce avec ses photos et son bailleur.
+    /// Le nom et le téléphone du bailleur sont exposés par l'API (contact).
+    /// </summary>
+    public override async Task<Annonce?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        return await _dbSet
+            .Include(a => a.Photos)
+            .Include(a => a.User)
+            .FirstOrDefaultAsync(a => a.Id == id, cancellationToken);
+    }
+
     /// <inheritdoc/>
     public async Task<(IEnumerable<Annonce> Items, int TotalCount)> GetPagedAsync(
         decimal? prixMin = null,
@@ -28,6 +40,7 @@ public class AnnonceRepository : Repository<Annonce>, IAnnonceRepository
     {
         var query = _dbSet
             .Include(a => a.Photos)
+            .Include(a => a.User)
             .Where(a => a.Statut == StatutAnnonce.Publiee && a.Disponible);
 
         if (prixMin.HasValue)
@@ -62,6 +75,7 @@ public class AnnonceRepository : Repository<Annonce>, IAnnonceRepository
     {
         return await _dbSet
             .Include(a => a.Photos)
+            .Include(a => a.User)
             .Where(a => a.Statut == StatutAnnonce.Publiee && a.Disponible)
             .Where(a => a.Latitude >= minLat && a.Latitude <= maxLat)
             .Where(a => a.Longitude >= minLng && a.Longitude <= maxLng)
@@ -73,6 +87,7 @@ public class AnnonceRepository : Repository<Annonce>, IAnnonceRepository
     {
         return await _dbSet
             .Include(a => a.Photos)
+            .Include(a => a.User)
             .Where(a => a.UserId == userId)
             .OrderByDescending(a => a.DateCreation)
             .ToListAsync(cancellationToken);
