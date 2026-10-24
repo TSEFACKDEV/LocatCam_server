@@ -176,13 +176,19 @@ public class AnnonceDto
 /// </summary>
 public class PhotoSignatureDto
 {
+    /// <summary>Nom du cloud Cloudinary à utiliser pour l'upload.</summary>
+    public string CloudName { get; set; } = string.Empty;
+
+    /// <summary>Clé API publique Cloudinary (non secrète) requise pour l'upload signé.</summary>
+    public string ApiKey { get; set; } = string.Empty;
+
     /// <summary>Horodatage de la signature.</summary>
     public long Timestamp { get; set; }
 
     /// <summary>Dossier de destination sur Cloudinary.</summary>
     public string Folder { get; set; } = "locatcam/annonces";
 
-    /// <summary>Nom du preset d'upload.</summary>
+    /// <summary>Nom du preset d'upload (vide si aucun preset n'est configuré).</summary>
     public string UploadPreset { get; set; } = string.Empty;
 
     /// <summary>Signature sécurisée générée côté serveur.</summary>

@@ -16,38 +16,54 @@ using System.Text;
 public class PhotoService : IPhotoService
 {
     private readonly Cloudinary _cloudinary;
+    private readonly string _cloudName;
+    private readonly string _apiKey;
     private readonly string _uploadPreset;
     private readonly string _apiSecret;
 
     /// <summary>Constructeur recevant la configuration Cloudinary.</summary>
     public PhotoService(IConfiguration configuration)
     {
-        var cloudName = configuration["Cloudinary:CloudName"] ?? "locatcam";
-        var apiKey = configuration["Cloudinary:ApiKey"] ?? string.Empty;
+        _cloudName = configuration["Cloudinary:CloudName"] ?? "locatcam";
+        _apiKey = configuration["Cloudinary:ApiKey"] ?? string.Empty;
         _apiSecret = configuration["Cloudinary:ApiSecret"] ?? string.Empty;
-        _uploadPreset = configuration["Cloudinary:UploadPreset"] ?? "locatcam_unsigned";
+        _uploadPreset = configuration["Cloudinary:UploadPreset"] ?? string.Empty;
 
-        var account = new Account(cloudName, apiKey, _apiSecret);
+        var account = new Account(_cloudName, _apiKey, _apiSecret);
         _cloudinary = new Cloudinary(account);
     }
 
     /// <inheritdoc/>
-    public async Task<PhotoSignatureDto> GenerateSignatureAsync(CancellationToken cancellationToken = default)
+    public Task<PhotoSignatureDto> GenerateSignatureAsync(CancellationToken cancellationToken = default)
     {
         var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
         var folder = "locatcam/annonces";
 
-        // Signature Cloudinary : SHA1 de "timestamp={timestamp}&folder={folder}&{api_secret}"
-        var signatureString = $"timestamp={timestamp}&folder={folder}&{_apiSecret}";
+        // Cloudinary signe les paramètres triés par ordre alphabétique.
+        // On ne signe que les paramètres réellement envoyés par le mobile :
+        // un upload_preset absent côté Cloudinary ferait échouer l'upload.
+        var parametres = new SortedDictionary<string, string>(StringComparer.Ordinal)
+        {
+            ["folder"] = folder,
+            ["timestamp"] = timestamp.ToString()
+        };
+
+        var preset = _uploadPreset.Trim();
+        if (!string.IsNullOrEmpty(preset))
+            parametres["upload_preset"] = preset;
+
+        var signatureString = string.Join("&", parametres.Select(p => $"{p.Key}={p.Value}")) + _apiSecret;
         var signature = ComputeHash(signatureString);
 
-        return new PhotoSignatureDto
+        return Task.FromResult(new PhotoSignatureDto
         {
+            CloudName = _cloudName,
+            ApiKey = _apiKey,
             Timestamp = timestamp,
             Folder = folder,
-            UploadPreset = _uploadPreset,
+            UploadPreset = preset,
             Signature = signature
-        };
+        });
     }
 
     /// <summary>

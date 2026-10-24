@@ -70,21 +70,29 @@ public class DataSeeder
         "Christian", "Samuel", "David", "Emmanuel", "Joseph"
     };
 
-    // URLs Unsplash réalistes pour logements
-    private static readonly string[] UnsplashImages =
+    // Photos réelles de logements (Pexels, licence gratuite) — URLs vérifiées.
+    private static readonly string[] PhotosLogements =
     {
-        "https://images.unsplash.com/photo-1502672260266-1c1efd283427?w=1200&q=80",
-        "https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=1200&q=80",
-        "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1200&q=80",
-        "https://images.unsplash.com/photo-1484154218962-a196002b5911?w=1200&q=80",
-        "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1200&q=80",
-        "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1200&q=80",
-        "https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?w=1200&q=80",
-        "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=1200&q=80",
-        "https://images.unsplash.com/photo-1445019980598-944ed28699e5?w=1200&q=80",
-        "https://images.unsplash.com/photo-1500511773475-3c44a5131e26?w=1200&q=80",
-        "https://images.unsplash.com/photo-1493230534771-123b249b4e67?w=1200&q=80",
-        "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80"
+        "https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg?auto=compress&cs=tinysrgb&w=1200",
+        "https://images.pexels.com/photos/271624/pexels-photo-271624.jpeg?auto=compress&cs=tinysrgb&w=1200",
+        "https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=1200",
+        "https://images.pexels.com/photos/1571463/pexels-photo-1571463.jpeg?auto=compress&cs=tinysrgb&w=1200",
+        "https://images.pexels.com/photos/1457842/pexels-photo-1457842.jpeg?auto=compress&cs=tinysrgb&w=1200",
+        "https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg?auto=compress&cs=tinysrgb&w=1200",
+        "https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&cs=tinysrgb&w=1200",
+        "https://images.pexels.com/photos/259588/pexels-photo-259588.jpeg?auto=compress&cs=tinysrgb&w=1200",
+        "https://images.pexels.com/photos/2102587/pexels-photo-2102587.jpeg?auto=compress&cs=tinysrgb&w=1200",
+        "https://images.pexels.com/photos/276724/pexels-photo-276724.jpeg?auto=compress&cs=tinysrgb&w=1200",
+        "https://images.pexels.com/photos/271816/pexels-photo-271816.jpeg?auto=compress&cs=tinysrgb&w=1200",
+        "https://images.pexels.com/photos/262048/pexels-photo-262048.jpeg?auto=compress&cs=tinysrgb&w=1200",
+        "https://images.pexels.com/photos/1329711/pexels-photo-1329711.jpeg?auto=compress&cs=tinysrgb&w=1200",
+        "https://images.pexels.com/photos/1918291/pexels-photo-1918291.jpeg?auto=compress&cs=tinysrgb&w=1200",
+        "https://images.pexels.com/photos/2029667/pexels-photo-2029667.jpeg?auto=compress&cs=tinysrgb&w=1200",
+        "https://images.pexels.com/photos/2082087/pexels-photo-2082087.jpeg?auto=compress&cs=tinysrgb&w=1200",
+        "https://images.pexels.com/photos/1648776/pexels-photo-1648776.jpeg?auto=compress&cs=tinysrgb&w=1200",
+        "https://images.pexels.com/photos/1743229/pexels-photo-1743229.jpeg?auto=compress&cs=tinysrgb&w=1200",
+        "https://images.pexels.com/photos/2062426/pexels-photo-2062426.jpeg?auto=compress&cs=tinysrgb&w=1200",
+        "https://images.pexels.com/photos/3935350/pexels-photo-3935350.jpeg?auto=compress&cs=tinysrgb&w=1200"
     };
 
     public DataSeeder(LocatCamDbContext context, ILogger<DataSeeder> logger)
@@ -208,6 +216,44 @@ public class DataSeeder
             }
         }
 
+        // 2 bis. Annonces curatées autour de Douala (position actuelle de test ~4.0483, 9.7043)
+        // afin d'avoir toujours des logements proches et des photos cohérentes.
+        var logementsProches = new (string Titre, string Description, decimal Prix, TypeAnnonce Type,
+            string Quartier, double Lat, double Lng, bool EstMeuble, int Pieces)[]
+        {
+            ("Chambre meublée à Bonabéri — Proche marché", "Chambre propre et meublée à Bonabéri, proche du marché et des transports. Eau et électricité incluses. Idéal pour étudiant.", 45000, TypeAnnonce.Chambre, "Bonabéri", 4.0490, 9.7060, true, 1),
+            ("Studio moderne à Bonabéri — Tout équipé", "Studio moderne avec kitchenette, salle de bain et coin nuit. Quartier calme, sécurisé, proche des commerces.", 75000, TypeAnnonce.Studio, "Bonabéri", 4.0460, 9.7020, true, 1),
+            ("Appartement T2 meublé à Makepe", "Bel appartement T2 meublé avec salon, cuisine équipée et balcon. Résidence sécurisée à Makepe.", 150000, TypeAnnonce.Appartement, "Makepe", 4.0520, 9.7130, true, 2),
+            ("Studio cosy à Logbessou", "Studio cosy et lumineux à Logbessou, proche des écoles et de la route principale. Disponible immédiatement.", 90000, TypeAnnonce.Studio, "Logbessou", 4.0630, 9.7150, false, 1),
+            ("Appartement T3 à Bonamoussadi", "Appartement T3 spacieux avec 2 chambres, salon, cuisine américaine et balcon. Quartier résidentiel prisé.", 220000, TypeAnnonce.Appartement, "Bonamoussadi", 4.0720, 9.7300, false, 3),
+            ("Maison 3 chambres à Bonabéri", "Maison familiale avec 3 chambres, salon, cuisine, 2 salles de bain et cour. Quartier calme et sécurisé.", 300000, TypeAnnonce.Maison, "Bonabéri", 4.0356, 9.7333, true, 3),
+            ("Chambre étudiante à Deido", "Chambre simple et sécurisée à Deido, proche des universités et des transports en commun. Loyer accessible.", 35000, TypeAnnonce.Chambre, "Deido", 4.0437, 9.7683, false, 1),
+            ("Appartement meublé à Bonapriso", "Appartement meublé haut standing à Bonapriso : salon, cuisine équipée, chambre climatisée. Proche restaurants et commerces.", 250000, TypeAnnonce.Appartement, "Bonapriso", 4.0511, 9.7679, true, 2)
+        };
+
+        foreach (var l in logementsProches)
+        {
+            annonces.Add(new Annonce
+            {
+                Titre = l.Titre,
+                Description = l.Description,
+                Prix = l.Prix,
+                Type = l.Type,
+                Quartier = l.Quartier,
+                Ville = "Douala",
+                Adresse = $"{l.Quartier}, Douala",
+                Latitude = l.Lat,
+                Longitude = l.Lng,
+                EstMeuble = l.EstMeuble,
+                NombrePieces = l.Pieces,
+                Disponible = true,
+                UserId = bailleurs[0].Id,
+                EstVerifie = true,
+                Statut = StatutAnnonce.Publiee,
+                DateCreation = DateTime.UtcNow.AddDays(-random.Next(1, 10))
+            });
+        }
+
         await _context.Annonces.AddRangeAsync(annonces);
         await _context.SaveChangesAsync();
 
@@ -218,7 +264,7 @@ public class DataSeeder
         foreach (var annonce in annonces)
         {
             int nbPhotos = random.Next(3, 7);
-            var selectedImages = UnsplashImages.OrderBy(_ => random.Next()).Take(nbPhotos).ToList();
+            var selectedImages = PhotosLogements.OrderBy(_ => random.Next()).Take(nbPhotos).ToList();
             for (int j = 0; j < selectedImages.Count; j++)
             {
                 photos.Add(new AnnoncePhoto
